@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_photo',  // Added this line
     ];
 
     /**
@@ -45,5 +46,28 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the full URL for the user's profile photo
+     *
+     * @return string|null
+     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        if ($this->profile_photo) {
+            return asset('storage/' . $this->profile_photo);
+        }
+        return null;
+    }
+
+    /**
+     * Check if user has a profile photo
+     *
+     * @return bool
+     */
+    public function hasProfilePhoto()
+    {
+        return !is_null($this->profile_photo);
     }
 }

@@ -1,159 +1,276 @@
 @extends("layouts.default")
 @section("title","beloved-Home")
 @section("content")
-    <main class="container" style="max-width: 900px">
+    <main class="container" style="max-width: 1200px;">
         <section>
-
             <style>
                 .product-container {
-
-                    background: #f8f9fa;
+                    background: #ffffff;
                     min-height: 100vh;
-                    padding-top: 20px ;
+                    padding: 20px 0;
+                }
+
+                .breadcrumb-custom {
+                    font-size: 14px;
+                    color: #6c757d;
+                    margin-bottom: 2rem;
+                }
+
+                .breadcrumb-custom a {
+                    color: #6c757d;
+                    text-decoration: none;
+                }
+
+                .breadcrumb-custom a:hover {
+                    color: #007bff;
+                }
+
+                .product-image-container {
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    aspect-ratio: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 1px solid #e9ecef;
                 }
 
                 .product-image {
-                    height: 400px;
-                    object-fit: cover;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
                 }
 
-                .price-display {
-                    font-size: 2rem;
+                .product-category {
+                    background: #f8f9fa;
+                    color: #6c757d;
+                    padding: 6px 12px;
+                    border-radius: 16px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    display: inline-block;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                .product-price {
+                    font-size: 2.5rem;
                     font-weight: 700;
+                    color: #333;
+                }
+
+
+                .delivery-badge {
+                    background: #e8f5e8;
+                    border: 1px solid #c8e6c9;
+                    border-radius: 8px;
+                    padding: 12px 16px;
+                }
+
+                .delivery-badge .delivery-title {
+                    color: #2e7d32;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .delivery-badge .delivery-subtitle {
+                    color: #4caf50;
+                    font-size: 14px;
+                    margin: 0;
                 }
 
                 .quantity-controls {
-                    border-radius: 25px;
-                    overflow: hidden;
                     border: 1px solid #dee2e6;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    display: inline-flex;
+                    align-items: center;
                 }
 
                 .quantity-btn {
                     width: 40px;
                     height: 40px;
                     border: none;
-                    background: white;
+                    background: #f8f9fa;
                     color: #6c757d;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: background-color 0.2s;
                 }
 
                 .quantity-btn:hover {
-                    background: #f8f9fa;
+                    background: #e9ecef;
                 }
 
                 .quantity-input {
                     border: none;
-                    width: 50px;
+                    width: 60px;
+                    height: 40px;
                     text-align: center;
                     font-weight: 500;
-                }
-
-                .rewards-bg {
-                    background-color: #fce4ec !important;
-                }
-
-                .bottom-nav {
-                    position: fixed;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
                     background: white;
-                    border-top: 1px solid #dee2e6;
-                    z-index: 1000;
                 }
 
-                .nav-item {
-                    flex: 1;
-                    text-align: center;
-                    padding: 12px 8px;
-                    text-decoration: none;
-                    color: #6c757d;
-                    font-size: 12px;
+                .quantity-input:focus {
+                    outline: none;
+                    box-shadow: none;
                 }
 
-                .nav-item.active {
-                    color: #007bff;
+                .btn-add-cart {
+                    background: #000;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 12px 24px;
+                    font-weight: 600;
+                    font-size: 16px;
+                    width: 100%;
+                    transition: background-color 0.2s;
                 }
 
-                .nav-item i {
-                    font-size: 20px;
-                    margin-bottom: 4px;
+                .btn-add-cart:hover {
+                    background: #333;
+                    color: white;
                 }
 
-                body {
-                    padding-bottom: 80px;
+                @media (max-width: 768px) {
+                    .product-layout {
+                        gap: 2rem;
+                    }
+
+                    .product-price {
+                        font-size: 2rem;
+                    }
                 }
             </style>
 
             <div class="product-container">
-                <div class="container" style="max-width: 500px;">
+                <!-- Breadcrumb -->
+                <nav class="breadcrumb-custom">
+                    <a href="#">Home</a> >
+                    <a href="#">Products</a> >
+                    <a href="#">Skincare</a> >
+                    <span class="text-dark">{{$product->title}}</span>
+                </nav>
 
-                    <!-- Alert Messages -->
-                    @if(session()->has("success"))
-                        <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
-                            {{session()->get("success")}}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-                    @if(session("error"))
-                        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
-                            {{session("error")}}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+                <!-- Alert Messages -->
+                @if(session()->has("success"))
+                    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                        {{session()->get("success")}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+                @if(session("error"))
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        {{session("error")}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
 
-                    <!-- Product Card -->
-                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                        <!-- Product Image -->
-                        <div class="product-image d-flex align-items-center justify-content-center">
+                <!-- Product Layout -->
+                <div class="row product-layout">
+                    <!-- Product Image -->
+                    <div class="col-lg-6 col-md-6">
+                        <div class="product-image-container">
                             @if($product->image)
-                                <img src="{{$product->image}}" alt="{{$product->title}}" class="w-100 h-100" style="object-fit: cover;">
+                                <img src="{{$product->image}}" alt="{{$product->title}}" class="product-image">
                             @else
-                                <div class="text-white text-center">
-                                    <i class="fas fa-image fa-3x mb-2"></i>
-                                    <p>Product Image</p>
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-image fa-4x mb-3"></i>
+                                    <p class="mb-0">Product Image</p>
                                 </div>
                             @endif
                         </div>
+                    </div>
 
-                        <!-- Product Info -->
-                        <div class="card-body p-4">
+                    <!-- Product Info -->
+                    <div class="col-lg-6 col-md-6">
+                        <div class="product-info">
+                            <!-- Category Badge -->
+                            <span class="product-category">Skincare</span>
+
                             <!-- Product Title -->
-                            <h1 class="h4 fw-semibold text-dark mb-4 lh-sm">{{$product->title}}</h1>
+                            <h1 class="product-title mb-4">{{$product->title}}</h1>
 
-                            <!-- Price and Quantity Section -->
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <div class="price-display text-dark">${{number_format($product->price ?? 0, 2)}}</div>
+                            <!-- Price -->
+                            <div class="product-price mb-3">${{number_format($product->price ?? 0, 2)}}</div>
 
-                                <!-- Quantity Controls -->
-                                <div class="quantity-controls d-flex align-items-center">
-                                    <button type="button" class="quantity-btn d-flex align-items-center justify-content-center" onclick="decreaseQuantity()">
+
+                            <!-- Delivery Info -->
+                            <div class="delivery-badge mb-4">
+                                <div class="delivery-title">
+                                    <i class="fas fa-shipping-fast"></i>
+                                    Fast delivery
+                                </div>
+                                <p class="delivery-subtitle">Ready to ship immediately</p>
+                            </div>
+
+                            <!-- Product Description -->
+                            @if($product->description)
+                                <div class="mb-4">
+                                    <p class="text-muted">{{$product->description}}</p>
+                                </div>
+                            @endif
+
+                            <!-- Quantity Section -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold mb-3">Quantity:</label>
+                                <div class="quantity-controls">
+                                    <button type="button" class="quantity-btn" onclick="decreaseQuantity()">
                                         <i class="fas fa-minus"></i>
                                     </button>
-                                    <input type="number" class="quantity-input form-control border-0 text-center" value="1" min="1" id="quantity">
-                                    <button type="button" class="quantity-btn d-flex align-items-center justify-content-center" onclick="increaseQuantity()">
+                                    <input type="number" class="quantity-input" value="1" min="1" id="quantity">
+                                    <button type="button" class="quantity-btn" onclick="increaseQuantity()">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
                             </div>
-                            <!-- Product Description -->
-                            @if($product->description)
-                                <div class="mb-4">
-                                    <p class="text-muted mb-0">{{$product->description}}</p>
-                                </div>
-                            @endif
-                            <!-- Add to Cart Button -->
-                            <form action="{{route('cart.add', $product->id)}}" method="GET" class="flex-grow-1">
-                                <input type="hidden" name="quantity" id="hiddenQuantity" value="1">
-                                <button type="submit" class="btn btn-danger w-100 rounded-3 fw-semibold py-3" style="font-size: 1.1rem;">
-                                    Add to cart
-                                </button>
-                            </form>
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-3">
+                                <form action="{{route('cart.add', $product->id)}}" method="GET">
+                                    <input type="hidden" name="quantity" id="hiddenQuantity" value="1">
+                                    <button type="submit" class="btn-add-cart">
+                                        <i class="fas fa-shopping-cart me-2"></i>
+                                        Add to Cart
+                                    </button>
+                                </form>
+
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <script>
+                function increaseQuantity() {
+                    const quantityInput = document.getElementById('quantity');
+                    const hiddenQuantity = document.getElementById('hiddenQuantity');
+                    let currentValue = parseInt(quantityInput.value);
+                    quantityInput.value = currentValue + 1;
+                    hiddenQuantity.value = currentValue + 1;
+                }
+
+                function decreaseQuantity() {
+                    const quantityInput = document.getElementById('quantity');
+                    const hiddenQuantity = document.getElementById('hiddenQuantity');
+                    let currentValue = parseInt(quantityInput.value);
+                    if (currentValue > 1) {
+                        quantityInput.value = currentValue - 1;
+                        hiddenQuantity.value = currentValue - 1;
+                    }
+                }
+
+                // Update hidden quantity when input changes
+                document.getElementById('quantity').addEventListener('change', function() {
+                    document.getElementById('hiddenQuantity').value = this.value;
+                });
+            </script>
         </section>
     </main>
 @endsection
-

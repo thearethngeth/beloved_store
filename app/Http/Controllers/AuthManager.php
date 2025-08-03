@@ -55,4 +55,7 @@ class AuthManager extends Controller
         }
         return redirect("register")->with("error", "Register Failed");
     }
+
+
+
 }

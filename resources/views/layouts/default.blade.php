@@ -11,6 +11,7 @@
 @include("includes.header")
 @yield("content")
 @include("includes.footer")
+@include("includes.bottom")
 <script src="{{asset("assets/js/bootstrap.min.js")}}"></script>
 @yield("script")
 </body>
