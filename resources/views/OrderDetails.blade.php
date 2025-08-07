@@ -22,7 +22,7 @@
                 }
 
                 .breadcrumb-custom a:hover {
-                    color: #007bff;
+                    color: #dc9bb9;
                 }
 
                 .order-header {
@@ -40,7 +40,7 @@
                 }
 
                 .order-date {
-                    color: #6c757d;
+                    color: #dc9bb9;
                     font-size: 14px;
                 }
 
@@ -60,9 +60,15 @@
                 }
 
                 .status-processing {
-                    background: #cce5ff;
-                    color: #0066cc;
-                    border: 1px solid #99d6ff;
+                    background: #f3c6dd;
+                    color: #ff69d3;
+                    border: 1px solid #ff90df;
+                }
+
+                .status-completed {
+                    background: #d4edda;
+                    color: #155724;
+                    border: 1px solid #c3e6cb;
                 }
 
                 .status-shipped {
@@ -155,7 +161,7 @@
 
                 .summary-row {
                     display: flex;
-
+                    justify-content: space-between;
                     align-items: center;
                     margin-bottom: 12px;
                 }
@@ -226,7 +232,7 @@
                 }
 
                 .btn-reorder {
-                    background: #000;
+                    background: #ff90df;
                     color: white;
                     border: none;
                     border-radius: 8px;
@@ -264,6 +270,26 @@
                     border-color: #adb5bd;
                 }
 
+                .btn-back {
+                    background: #ff90df;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 8px 16px;
+                    font-weight: 600;
+                    text-decoration: none;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: background-color 0.2s;
+                    margin-bottom: 20px;
+                }
+
+                .btn-back:hover {
+                    background: #e4c2e4;
+                    color: white;
+                }
+
                 @media (max-width: 768px) {
                     .order-item {
                         flex-direction: column;
@@ -294,12 +320,17 @@
             </style>
 
             <div class="order-container">
+                <!-- Back Button -->
+                <a href="{{ route('orders.index') }}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Orders
+                </a>
+
                 <!-- Breadcrumb -->
                 <nav class="breadcrumb-custom">
-                    <a href="#">Home</a> >
-                    <a href="#">My Account</a> >
-                    <a href="#">Orders</a> >
-                    <span class="text-dark">Order #{{$order->order_number ?? 'ORD-2024-001'}}</span>
+                    <a href="{{ route('home') }}">Home</a> >
+                    <a href="{{ route('orders.index') }}">My Orders</a> >
+                    Order Details
                 </nav>
 
                 <!-- Alert Messages -->
@@ -310,180 +341,139 @@
                     </div>
                 @endif
 
+                @if(session()->has("error"))
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        {{session()->get("error")}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
                 <!-- Order Header -->
                 <div class="order-header">
-                    <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <div class="order-number">Order #{{$order->order_number ?? 'ORD-2024-001'}}</div>
-                            <div class="order-date">Placed on {{$order->created_at ? $order->created_at->format('F j, Y') : 'January 15, 2024'}}</div>
+                    <div class="d-flex justify-content-between align-items-start flex-wrap">
+                        <div>
+                            <div class="order-number">
+                                Order #{{ $orderData->order_number ?? str_pad($orderData->id, 6, '0', STR_PAD_LEFT) }}
+                            </div>
+                            <div class="order-date">
+                                Placed on {{ $orderData->created_at->format('F j, Y \a\t g:i A') }}
+                            </div>
                         </div>
-                        <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                            <span class="status-badge status-{{strtolower($order->status ?? 'processing')}}">
-                                {{ucfirst($order->status ?? 'Processing')}}
-                            </span>
+                        <span class="status-badge status-{{ strtolower($orderData->payment_status ?? $orderData->status ?? 'processing') }}">
+                            {{ ucfirst($orderData->payment_status ?? $orderData->status ?? 'Processing') }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="order-section">
+                    <h3 class="section-title">Order Items</h3>
+                    @foreach($orderData->items as $item)
+                        <div class="order-item">
+                            <img src="{{ $item->product->image ?? '/images/placeholder.png' }}"
+                                 alt="{{ $item->product->name ?? $item->product->title ?? 'Product' }}"
+                                 class="item-image">
+                            <div class="item-details">
+                                <div class="item-name">
+                                    {{ $item->product->name ?? $item->product->title ?? $item->product->description ?? 'Product' }}
+                                </div>
+                                <div class="item-price">
+                                    ${{ number_format($item->price, 2) }} each
+                                </div>
+                                <div class="item-quantity">
+                                    Quantity: {{ $item->quantity }}
+                                </div>
+                            </div>
+                            <div class="item-total">
+                                ${{ number_format($item->total, 2) }}
+                            </div>
+                        </div>
+                    @endforeach
+
+                    <!-- Order Summary -->
+                    <div class="order-summary mt-3">
+                        <div class="summary-row">
+                            <span class="summary-label">Subtotal:</span>
+                            <span class="summary-value">${{ number_format($orderData->subtotal ?? $orderData->total_price, 2) }}</span>
+                        </div>
+                        @if(isset($orderData->shipping_cost) && $orderData->shipping_cost > 0)
+                            <div class="summary-row">
+                                <span class="summary-label">Shipping:</span>
+                                <span class="summary-value">${{ number_format($orderData->shipping_cost, 2) }}</span>
+                            </div>
+                        @endif
+                        @if(isset($orderData->tax) && $orderData->tax > 0)
+                            <div class="summary-row">
+                                <span class="summary-label">Tax:</span>
+                                <span class="summary-value">${{ number_format($orderData->tax, 2) }}</span>
+                            </div>
+                        @endif
+                        <div class="summary-row">
+                            <span class="summary-label">Total:</span>
+                            <span class="summary-value">${{ number_format($orderData->total ?? $orderData->total_price, 2) }}</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="row">
-                    <!-- Left Column - Order Items -->
-                    <div class="col-lg-8">
-                        <!-- Order Items Section -->
+                    <!-- Shipping Information -->
+                    <div class="col-md-6">
                         <div class="order-section">
-                            <h3 class="section-title">
-                                <i class="fas fa-box me-2"></i>
-                                Order Items
-                            </h3>
-
-                            @if(isset($order->items) && $order->items->count() > 0)
-                                @foreach($order->items as $item)
-                                    <div class="order-item">
-                                        <img src="{{$item->product->image ?? 'https://via.placeholder.com/80x80?text=Product'}}"
-                                             alt="{{$item->product->title ?? 'Product'}}"
-                                             class="item-image">
-                                        <div class="item-details">
-                                            <div class="item-name">{{$item->product->title ?? 'Sample Product Name'}}</div>
-                                            <div class="item-price">${{number_format($item->price ?? 9.00, 2)}} each</div>
-                                            <div class="item-quantity">Quantity: {{$item->quantity ?? 1}}</div>
-                                        </div>
-                                        <div class="item-total">
-                                            ${{number_format(($item->price ?? 9.00) * ($item->quantity ?? 1), 2)}}
-                                        </div>
-                                    </div>
-                                @endforeach
-                            @else
-                                <!-- Sample items for demonstration -->
-                                <div class="order-item">
-                                    <img src="https://via.placeholder.com/80x80?text=Product" alt="Sample Product" class="item-image">
-                                    <div class="item-details">
-                                        <div class="item-name">Hatomugi Beauty Mask 7 Sheets</div>
-                                        <div class="item-price">$9.00 each</div>
-                                        <div class="item-quantity">Quantity: 2</div>
-                                    </div>
-                                    <div class="item-total">$18.00</div>
-                                </div>
-                                <div class="order-item">
-                                    <img src="https://via.placeholder.com/80x80?text=Product" alt="Sample Product 2" class="item-image">
-                                    <div class="item-details">
-                                        <div class="item-name">Vitamin C Serum</div>
-                                        <div class="item-price">$25.00 each</div>
-                                        <div class="item-quantity">Quantity: 1</div>
-                                    </div>
-                                    <div class="item-total">$25.00</div>
-                                </div>
-                            @endif
-                        </div>
-
-                        <!-- Shipping Information -->
-                        <div class="order-section">
-                            <h3 class="section-title">
-                                <i class="fas fa-shipping-fast me-2"></i>
-                                Shipping Information
-                            </h3>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="address-block">
-                                        <div class="address-title">Shipping Address</div>
-                                        <p class="address-text">
-                                            {{$order->shipping_name ?? 'John Doe'}}<br>
-                                            {{$order->shipping_address ?? '123 Main Street'}}<br>
-                                            {{$order->shipping_city ?? 'Phnom Penh'}}, {{$order->shipping_state ?? 'Cambodia'}} {{$order->shipping_zip ?? '12000'}}<br>
-                                            {{$order->shipping_phone ?? '+855 12 345 678'}}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="address-block">
-                                        <div class="address-title">Billing Address</div>
-                                        <p class="address-text">
-                                            {{$order->billing_name ?? 'John Doe'}}<br>
-                                            {{$order->billing_address ?? '123 Main Street'}}<br>
-                                            {{$order->billing_city ?? 'Phnom Penh'}}, {{$order->billing_state ?? 'Cambodia'}} {{$order->billing_zip ?? '12000'}}<br>
-                                            {{$order->billing_phone ?? '+855 12 345 678'}}
-                                        </p>
-                                    </div>
+                            <h3 class="section-title">Shipping Information</h3>
+                            <div class="address-block">
+                                <div class="address-title">Delivery Address</div>
+                                <div class="address-text">
+                                    {{ $orderData->shipping_name ?? auth()->user()->name }}<br>
+                                    {{ $orderData->shipping_address ?? $orderData->address }}<br>
+                                    {{ $orderData->shipping_city ?? 'Phnom Penh' }}, {{ $orderData->shipping_state ?? 'Cambodia' }} {{ $orderData->shipping_zip ?? $orderData->pincode }}<br>
+                                    Phone: {{ $orderData->shipping_phone ?? $orderData->phone }}
                                 </div>
                             </div>
 
-                            @if(isset($order->tracking_number))
+                            @if(in_array(strtolower($orderData->payment_status ?? $orderData->status ?? 'processing'), ['shipped', 'delivered']))
                                 <div class="tracking-info">
                                     <div class="tracking-title">
-                                        <i class="fas fa-truck me-2"></i>
+                                        <i class="fas fa-truck"></i>
                                         Tracking Information
                                     </div>
-                                    <div class="tracking-number">{{$order->tracking_number}}</div>
+                                    <div class="tracking-number">
+                                        {{ $orderData->tracking_number ?? 'TRK' . strtoupper(substr(md5($orderData->id), 0, 10)) }}
+                                    </div>
                                 </div>
                             @endif
                         </div>
                     </div>
 
-                    <!-- Right Column - Order Summary -->
-                    <div class="col-lg-4">
+                    <!-- Payment Information -->
+                    <div class="col-md-6">
                         <div class="order-section">
-                            <h3 class="section-title">
-                                <i class="fas fa-receipt me-2"></i>
-                                Order Summary
-                            </h3>
-
-                            <div class="order-summary">
-                                <div class="summary-row">
-                                    <span class="summary-label">Subtotal:</span>
-                                    <span class="summary-value">${{number_format($order->subtotal ?? 43.00, 2)}}</span>
-                                </div>
-                                <div class="summary-row">
-                                    <span class="summary-label">Shipping:</span>
-                                    <span class="summary-value">${{number_format($order->shipping_cost ?? 5.00, 2)}}</span>
-                                </div>
-                                <div class="summary-row">
-                                    <span class="summary-label">Tax:</span>
-                                    <span class="summary-value">${{number_format($order->tax ?? 3.84, 2)}}</span>
-                                </div>
-                                @if(isset($order->discount) && $order->discount > 0)
-                                    <div class="summary-row">
-                                        <span class="summary-label">Discount:</span>
-                                        <span class="summary-value text-success">-${{number_format($order->discount, 2)}}</span>
-                                    </div>
-                                @endif
-                                <div class="summary-row">
-                                    <span class="summary-label">Total:</span>
-                                    <span class="summary-value">${{number_format($order->total ?? 51.84, 2)}}</span>
+                            <h3 class="section-title">Payment Information</h3>
+                            <div class="address-block">
+                                <div class="address-title">Billing Address</div>
+                                <div class="address-text">
+                                    {{ $orderData->billing_name ?? auth()->user()->name }}<br>
+                                    {{ $orderData->billing_address ?? $orderData->address }}<br>
+                                    {{ $orderData->billing_city ?? 'Phnom Penh' }}, {{ $orderData->billing_state ?? 'Cambodia' }} {{ $orderData->billing_zip ?? $orderData->pincode }}<br>
+                                    Phone: {{ $orderData->billing_phone ?? $orderData->phone }}
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Payment Information -->
-                        <div class="order-section">
-                            <h3 class="section-title">
-                                <i class="fas fa-credit-card me-2"></i>
-                                Payment Method
-                            </h3>
-
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-credit-card me-3 text-muted"></i>
-                                <div>
-                                    <div class="fw-semibold">{{$order->payment_method ?? 'Credit Card'}}</div>
-                                    <div class="text-muted small">****{{$order->card_last_four ?? '1234'}}</div>
+                            <div class="address-block">
+                                <div class="address-title">Payment Method</div>
+                                <div class="address-text">
+                                    {{ $orderData->payment_method ?? 'Credit Card' }}
+                                    @if(isset($orderData->card_last_four))
+                                        <br>**** **** **** {{ $orderData->card_last_four }}
+                                    @endif
+                                    @if($orderData->payment_id)
+                                        <br><small class="text-muted">Payment ID: {{ Str::limit($orderData->payment_id, 20) }}</small>
+                                    @endif
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="order-section">
-                            <div class="action-buttons">
-                                <a href="#" class="btn-reorder">
-                                    <i class="fas fa-redo"></i>
-                                    Reorder
-                                </a>
-                                @if(isset($order->tracking_number))
-                                    <a href="#" class="btn-track">
-                                        <i class="fas fa-truck"></i>
-                                        Track Order
-                                    </a>
-                                @endif
                             </div>
                         </div>
                     </div>
+                </div>
+
                 </div>
             </div>
         </section>

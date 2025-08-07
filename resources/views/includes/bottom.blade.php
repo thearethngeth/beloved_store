@@ -16,7 +16,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-
+        background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
         z-index: 1030; /* Higher than Bootstrap's default z-index */
         padding: 8px 0 12px 0;
@@ -85,7 +85,6 @@
         }
     }
 
-
     @media (max-width: 320px) {
         .bottom-nav-container {
             padding: 0 8px;
@@ -128,6 +127,18 @@
         </a>
 
         @auth
+            <a href="{{route('orders.index')}}" class="bottom-nav-item {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                <span class="bottom-nav-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <path d="M9 9h6v6H9z"/>
+                        <path d="M21 9H3"/>
+                        <path d="M9 21V3"/>
+                    </svg>
+                </span>
+                <span class="bottom-nav-text">Orders</span>
+            </a>
+
             <a href="{{route('profile.show')}}" class="bottom-nav-item {{ request()->routeIs('profile.show') ? 'active' : '' }}">
                 <span class="bottom-nav-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -136,6 +147,17 @@
                     </svg>
                 </span>
                 <span class="bottom-nav-text">Profile</span>
+            </a>
+        @else
+            <a href="{{route('login')}}" class="bottom-nav-item">
+                <span class="bottom-nav-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                        <polyline points="10,17 15,12 10,7"/>
+                        <line x1="15" y1="12" x2="3" y2="12"/>
+                    </svg>
+                </span>
+                <span class="bottom-nav-text">Login</span>
             </a>
         @endauth
     </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Orders;
+use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Stripe\Climate\Order;
@@ -110,7 +111,6 @@ class OrderManager extends Controller
         return redirect()->route('cart.show')->with('error','Something went wrong');
     }
 
-
     function paymentSuccess($order_id){
         // Find the order by ID
         $order = Orders::find($order_id);
@@ -134,7 +134,7 @@ class OrderManager extends Controller
         // We'll just be careful about what information we display
 
         return view('success', compact('order'));
-}
+    }
 
     function paymentError(){
         return "error";
@@ -147,9 +147,9 @@ class OrderManager extends Controller
         $sigHeader = $request->header('Stripe-Signature');
 
         try {
-         $event = Webhook::constructEvent(
-             $payload, $sigHeader, $endpointSecret
-         );
+            $event = Webhook::constructEvent(
+                $payload, $sigHeader, $endpointSecret
+            );
         } catch(UnexpectedValueException $e) {
             return response()->json(['error'=>'Invalid payload'],400);
         } catch (SignatureVerificationException $e) {
@@ -161,7 +161,7 @@ class OrderManager extends Controller
             $orderId = $session->metadata->order_id;
             $paymentId = $session->payment_intent;
 
-            $order = Order::find($orderId);
+            $order = Orders::find($orderId); // Fixed: was using Order instead of Orders
             if($order){
                 $order->payment_id = $paymentId;
                 $order->payment_status = "completed";
@@ -171,6 +171,7 @@ class OrderManager extends Controller
 
         return response()->json(['status'=>'success'],200);
     }
+
     function myOrders()
     {
         $orders = Orders::where('user_id', auth()->user()->id)
@@ -213,49 +214,79 @@ class OrderManager extends Controller
             }
         }
 
-        // Add items to order object for the view
-        $order->items = $orderItems;
-
         // Calculate order summary
-        $order->subtotal = $orderItems->sum('total');
-        $order->shipping_cost = 5.00; // You can make this dynamic
-        $order->tax = round($order->subtotal * 0.08, 2); // 8% tax rate
-        $order->total = $order->subtotal + $order->shipping_cost + $order->tax;
+        $subtotal = $orderItems->sum('total');
+        $shippingCost = 5.00; // You can make this dynamic
+        $tax = round($subtotal * 0.08, 2); // 8% tax rate
+        $total = $subtotal + $shippingCost + $tax;
 
-        // Generate order number if not exists
-        if (!$order->order_number) {
-            $order->order_number = 'ORD-' . date('Y') . '-' . str_pad($order->id, 6, '0', STR_PAD_LEFT);
-            $order->save();
-        }
+        // Generate order number (don't save to database)
+        $orderNumber = 'ORD-' . date('Y') . '-' . str_pad($order->id, 6, '0', STR_PAD_LEFT);
 
         // Set default status if not exists
-        if (!$order->status) {
-            $order->status = 'processing';
-        }
+        $status = 'processing'; // Default status since we don't have a status column
 
         // Set shipping and billing info from order data
-        $order->shipping_name = auth()->user()->name;
-        $order->shipping_address = $order->address;
-        $order->shipping_city = 'Phnom Penh';
-        $order->shipping_state = 'Cambodia';
-        $order->shipping_zip = $order->pincode;
-        $order->shipping_phone = $order->phone;
+        $shippingName = auth()->user()->name;
+        $shippingAddress = $order->address;
+        $shippingCity = 'Phnom Penh';
+        $shippingState = 'Cambodia';
+        $shippingZip = $order->pincode;
+        $shippingPhone = $order->phone;
 
         // Billing same as shipping for now
-        $order->billing_name = $order->shipping_name;
-        $order->billing_address = $order->shipping_address;
-        $order->billing_city = $order->shipping_city;
-        $order->billing_state = $order->shipping_state;
-        $order->billing_zip = $order->shipping_zip;
-        $order->billing_phone = $order->shipping_phone;
+        $billingName = $shippingName;
+        $billingAddress = $shippingAddress;
+        $billingCity = $shippingCity;
+        $billingState = $shippingState;
+        $billingZip = $shippingZip;
+        $billingPhone = $shippingPhone;
 
         // Payment method info
-        $order->payment_method = 'Credit Card';
-        $order->card_last_four = '1234'; // You would get this from Stripe
+        $paymentMethod = 'Credit Card';
+        $cardLastFour = '1234'; // You would get this from Stripe
 
-        return view('orders.details', compact('order'));
+        // Generate tracking number for shipped/delivered orders
+        $trackingNumber = null;
+        if (in_array(strtolower($order->payment_status ?? $status), ['shipped', 'delivered'])) {
+            $trackingNumber = 'TRK' . strtoupper(substr(md5($order->id), 0, 10));
+        }
+
+        // Create a data object to pass to the view instead of modifying the model
+        $orderData = (object)[
+            'id' => $order->id,
+            'order_number' => $orderNumber,
+            'created_at' => $order->created_at,
+            'payment_status' => $order->payment_status,
+            'status' => $status,
+            'total_price' => $order->total_price,
+            'payment_id' => $order->payment_id,
+            'address' => $order->address,
+            'pincode' => $order->pincode,
+            'phone' => $order->phone,
+            'items' => $orderItems,
+            'subtotal' => $subtotal,
+            'shipping_cost' => $shippingCost,
+            'tax' => $tax,
+            'total' => $total,
+            'shipping_name' => $shippingName,
+            'shipping_address' => $shippingAddress,
+            'shipping_city' => $shippingCity,
+            'shipping_state' => $shippingState,
+            'shipping_zip' => $shippingZip,
+            'shipping_phone' => $shippingPhone,
+            'billing_name' => $billingName,
+            'billing_address' => $billingAddress,
+            'billing_city' => $billingCity,
+            'billing_state' => $billingState,
+            'billing_zip' => $billingZip,
+            'billing_phone' => $billingPhone,
+            'payment_method' => $paymentMethod,
+            'card_last_four' => $cardLastFour,
+            'tracking_number' => $trackingNumber
+        ];
+
+        // Return the correct view path
+        return view('OrderDetails', compact('orderData'));
     }
-
-
-
 }

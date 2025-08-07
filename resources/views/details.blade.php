@@ -122,7 +122,7 @@
                 }
 
                 .btn-add-cart {
-                    background: #000;
+                    background: #ff90df;
                     color: white;
                     border: none;
                     border-radius: 8px;
