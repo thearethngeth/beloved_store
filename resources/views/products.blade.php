@@ -33,6 +33,7 @@
             box-shadow: 0 4px 15px rgba(235, 138, 188, 0.15);
             transition: all 0.3s ease;
             overflow: hidden;
+            height: 100%;
         }
 
         .product-card:hover {
@@ -58,6 +59,7 @@
             text-decoration: none;
             display: block;
             margin-bottom: 10px;
+            line-height: 1.3;
         }
 
         .btn-primary{
@@ -80,12 +82,15 @@
             border: none;
             border-radius: 20px;
             color: white;
-            padding: 6px 16px;
+            padding: 8px 16px;
             font-size: 0.85rem;
             font-weight: 500;
             transition: all 0.3s ease;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             width: 100%;
             text-align: center;
         }
@@ -106,19 +111,40 @@
         .product-price {
             color: #eb8abc;
             font-weight: bold;
-            font-size: 1.2rem;
-            margin-bottom: 10px;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
         }
 
         .card-body {
             padding: 1rem;
+            display: flex;
+            flex-direction: column;
         }
 
         .product-info {
             flex-grow: 1;
         }
 
-        /* Pagination custom styles */
+        /* Search and Filter Section */
+        .search-filter-section {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-control, .form-select {
+            border-radius: 25px;
+            border: 2px solid #f0f0f0;
+            padding: 10px 15px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #eb8abc;
+            box-shadow: 0 0 0 0.2rem rgba(235, 138, 188, 0.25);
+        }
+
         /* Enhanced Pagination Styles */
         .pagination {
             display: flex;
@@ -162,7 +188,6 @@
             outline: none;
         }
 
-        /* Active page styling */
         .pagination .page-item.active .page-link {
             background-color: #eb8abc;
             border-color: #eb8abc;
@@ -171,7 +196,6 @@
             transform: scale(1.1);
         }
 
-        /* Disabled state */
         .pagination .page-item.disabled .page-link {
             color: #ccc;
             border-color: #e9ecef;
@@ -185,7 +209,6 @@
             box-shadow: 0 2px 8px rgba(235, 138, 188, 0.1);
         }
 
-        /* First/Last page special styling */
         .pagination .page-item:first-child .page-link,
         .pagination .page-item:last-child .page-link {
             background: linear-gradient(135deg, #eb8abc 0%, #d67aa8 100%);
@@ -200,7 +223,6 @@
             transform: translateY(-2px) scale(1.05);
         }
 
-        /* Add icons for prev/next */
         .pagination .page-item:first-child .page-link::before {
             content: "‹";
             font-size: 1.2em;
@@ -213,16 +235,198 @@
             margin-left: 4px;
         }
 
-        /* Responsive design */
-        @media (max-width: 576px) {
-            .pagination .page-link {
-                padding: 10px 14px;
-                font-size: 0.9rem;
-                min-width: 44px;
+        /* ========== MOBILE RESPONSIVE STYLES ========== */
+
+        /* Large tablets and small desktops */
+        @media (max-width: 991px) {
+            .product-img {
+                height: 200px;
             }
 
+            .hero-title {
+                font-size: 2.2rem;
+            }
+        }
+
+        /* Tablets */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 40px 0;
+                margin-bottom: 30px;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .product-img {
+                height: 180px;
+            }
+
+            .search-filter-section {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            .form-control, .form-select {
+                margin-bottom: 10px;
+            }
+
+            /* Stack search form elements on tablets */
+            .search-form {
+                flex-direction: column;
+                gap: 15px !important;
+            }
+
+            .search-form .flex-grow-1,
+            .search-form .form-select {
+                width: 100% !important;
+            }
+
+            .btn-primary,
+            .btn-outline-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Mobile phones */
+        @media (max-width: 576px) {
+            /* Hero section adjustments */
+            .hero-section {
+                padding: 30px 0;
+                margin-bottom: 20px;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+                margin-bottom: 10px;
+            }
+
+            .hero-subtitle {
+                font-size: 0.95rem;
+            }
+
+            /* Product grid - 2 columns on mobile */
+            .product-col-mobile {
+                width: 50%;
+                padding: 8px;
+            }
+
+            /* Product card adjustments */
+            .product-card {
+                border-radius: 12px;
+                margin-bottom: 0;
+            }
+
+            .product-img {
+                height: 140px;
+                border-radius: 12px 12px 0 0;
+            }
+
+            .card-body {
+                padding: 12px;
+            }
+
+            .product-title {
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+                line-height: 1.2;
+                /* Limit to 2 lines */
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .product-price {
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+
+            .btn-cart {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+                border-radius: 15px;
+                gap: 4px;
+            }
+
+            .btn-cart svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            /* Search section */
+            .search-filter-section {
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            .form-control, .form-select {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+                border-radius: 20px;
+            }
+
+            /* Pagination mobile styles */
             .pagination {
                 gap: 4px;
+                margin: 1.5rem 0;
+            }
+
+            .pagination .page-link {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                min-width: 40px;
+            }
+
+            .pagination .page-item:first-child .page-link::before,
+            .pagination .page-item:last-child .page-link::after {
+                font-size: 1em;
+                margin: 0;
+            }
+
+            /* Container padding adjustments */
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            /* Results text */
+            .results-text {
+                font-size: 0.9rem;
+                margin-bottom: 15px;
+            }
+
+            /* Alert messages */
+            .alert {
+                font-size: 0.9rem;
+                padding: 10px 15px;
+                border-radius: 10px;
+            }
+        }
+
+        /* Extra small phones */
+        @media (max-width: 375px) {
+            .product-img {
+                height: 120px;
+            }
+
+            .hero-title {
+                font-size: 1.6rem;
+            }
+
+            .card-body {
+                padding: 10px;
+            }
+
+            .btn-cart {
+                font-size: 0.75rem;
+                padding: 6px 10px;
             }
         }
 
@@ -239,25 +443,12 @@
             }
         }
 
-        /* Mobile responsive */
-        @media (max-width: 768px) {
-            .hero-section {
-                padding: 40px 0;
-            }
-            .hero-title {
-                font-size: 2rem;
-            }
-            .product-img {
-                height: 180px;
-            }
-        }
-
+        /* Custom mobile grid */
         @media (max-width: 576px) {
-            .hero-title {
-                font-size: 1.8rem;
-            }
-            .hero-subtitle {
-                font-size: 1rem;
+            .mobile-grid {
+                display: flex;
+                flex-wrap: wrap;
+                margin: 0 -8px;
             }
         }
     </style>
@@ -295,36 +486,34 @@
 
     <!-- Search and Filter Section -->
     <div class="container mb-4">
-        <div class="row">
-            <div class="col-12">
-                <form method="GET" action="{{ route('home') }}" class="d-flex flex-wrap gap-3 align-items-center">
-                    <!-- Search Input -->
-                    <div class="flex-grow-1">
-                        <input type="text"
-                               name="search"
-                               class="form-control"
-                               placeholder="🔍 Search products..."
-                               value="{{ request('search') }}">
-                    </div>
+        <div class="search-filter-section">
+            <form method="GET" action="{{ route('home') }}" class="d-flex flex-wrap gap-3 align-items-center search-form">
+                <!-- Search Input -->
+                <div class="flex-grow-1">
+                    <input type="text"
+                           name="search"
+                           class="form-control"
+                           placeholder="🔍 Search products..."
+                           value="{{ request('search') }}">
+                </div>
 
-                    <!-- Sort Dropdown -->
-                    <select name="sort" class="form-select" style="width: auto;">
-                        <option value="">Sort by</option>
-                        <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name A-Z</option>
-                        <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
-                        <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
-                        <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
-                    </select>
+                <!-- Sort Dropdown -->
+                <select name="sort" class="form-select" style="width: auto;">
+                    <option value="">Sort by</option>
+                    <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name A-Z</option>
+                    <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                    <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                    <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
+                </select>
 
-                    <!-- Search Button -->
-                    <button type="submit" class="btn btn-primary">Filter</button>
+                <!-- Search Button -->
+                <button type="submit" class="btn btn-primary">Filter</button>
 
-                    <!-- Clear Button -->
-                    @if(request('search') || request('sort'))
-                        <a href="{{ route('home') }}" class="btn btn-outline-secondary">Clear</a>
-                    @endif
-                </form>
-            </div>
+                <!-- Clear Button -->
+                @if(request('search') || request('sort'))
+                    <a href="{{ route('home') }}" class="btn btn-outline-secondary">Clear</a>
+                @endif
+            </form>
         </div>
     </div>
 
@@ -332,7 +521,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <p class="text-muted">
+                <p class="text-muted results-text">
                     Showing {{ $products->count() }} of {{ $products->total() }} products
                     @if(request('search'))
                         for "{{ request('search') }}"
@@ -345,16 +534,17 @@
     <!-- Products Section -->
     <main class="container">
         <section>
-            <div class="row">
+            <!-- Desktop/Tablet Grid (Bootstrap) -->
+            <div class="row d-none d-sm-flex">
                 @foreach($products as $product)
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-                        <div class="card product-card h-100">
+                        <div class="card product-card">
                             <a href="{{route('products.details', $product->slug)}}">
                                 <img src="{{$product->image}}"
                                      class="product-img"
                                      alt="{{$product->title}}">
                             </a>
-                            <div class="card-body d-flex flex-column">
+                            <div class="card-body">
                                 <div class="product-info">
                                     <a href="{{route('products.details', $product->slug)}}"
                                        class="product-title">
@@ -368,18 +558,63 @@
                                     @auth
                                         <a href="{{ route('cart.add', $product->id) }}"
                                            class="btn-cart">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M4 7h16l-1 10H5L4 7z"/>
                                                 <path d="M4 7L2 3H1"/>
                                                 <circle cx="9" cy="20" r="1" fill="currentColor"/>
                                                 <circle cx="20" cy="20" r="1" fill="currentColor"/>
                                             </svg>
-                                             Add to Cart
+                                            Add to Cart
                                         </a>
                                     @else
                                         <a href="{{ route('login') }}"
                                            class="btn-cart">
                                             🛒 Login to Add
+                                        </a>
+                                    @endauth
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Mobile Grid (Custom) -->
+            <div class="mobile-grid d-sm-none">
+                @foreach($products as $product)
+                    <div class="product-col-mobile">
+                        <div class="card product-card">
+                            <a href="{{route('products.details', $product->slug)}}">
+                                <img src="{{$product->image}}"
+                                     class="product-img"
+                                     alt="{{$product->title}}">
+                            </a>
+                            <div class="card-body">
+                                <div class="product-info">
+                                    <a href="{{route('products.details', $product->slug)}}"
+                                       class="product-title">
+                                        {{$product->title}}
+                                    </a>
+                                    <div class="product-price">${{$product->price}}</div>
+                                </div>
+
+                                <!-- Add to Cart Button -->
+                                <div class="mt-auto">
+                                    @auth
+                                        <a href="{{ route('cart.add', $product->id) }}"
+                                           class="btn-cart">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M4 7h16l-1 10H5L4 7z"/>
+                                                <path d="M4 7L2 3H1"/>
+                                                <circle cx="9" cy="20" r="1" fill="currentColor"/>
+                                                <circle cx="20" cy="20" r="1" fill="currentColor"/>
+                                            </svg>
+                                            Add to Cart
+                                        </a>
+                                    @else
+                                        <a href="{{ route('login') }}"
+                                           class="btn-cart">
+                                            🛒 Login
                                         </a>
                                     @endauth
                                 </div>
